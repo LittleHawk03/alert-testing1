@@ -1,4 +1,4 @@
-# Survey gcp notifacation channel
+# Survey the alert function of google cloud platform and Configuration of Google Cloud Platform
 
 ## Table of content
 
