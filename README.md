@@ -508,6 +508,10 @@ vd:
 ##### 5.1 Mô hình giám sát trên máy tính cá nhân
 
 
+<div align="center">
+  <img src="assets/pic_28.png">
+</div>
+
 
 ##### 5.2 Cấu hình gửi cảnh báo đến slack
 

@@ -46,7 +46,7 @@ receivers:
         text: "{{ .CommonAnnotations.description }}"
         username: "Prometheus"
         channel: "#test"
-        api_url: "https://hooks.slack.com/services/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"
+        api_url: "https://hooks.slack.com/services/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"
     webhook_configs:
       - url: "https://telepush.dev/api/inlets/alertmanager/123d43"
         http_config:
@@ -64,7 +64,7 @@ receivers:
         text: "{{ .CommonAnnotations.description }}"
         username: "Prometheus"
         channel: "#test"
-        api_url: "https://hooks.slack.com/services/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"
+        api_url: "https://hooks.slack.com/services/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"
 
   - name: "telegram"
     webhook_configs:
