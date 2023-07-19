@@ -1,6 +1,33 @@
-## survey gcp notifacation channel
+# Survey gcp notifacation channel
 
-### 1. preview
+## Table of content
+
+### [I. Khảo sát tính năng cảnh báo của Google Cloud Platform](#i-khảo-sát-tính-năng-cảnh-báo-của-google-cloud-platform)
+
+1. [Cảnh báo qua tính năng pub/sub](#1-thông-báo-qua-tính-năng-pubsub-publisher--subscriber)
+2. [Cảnh báo qua ứng dụng tin nhắn slack](#2-thông-báo-qua-tính-năng-slack)
+3. [Cảnh báo qua tính năng Webhooks](#3-thông-báo-qua-tính-năng-webhooks-ở-đây-em-sử-dụng-webhook-của-một-chat-bot-trên-telegram)
+4. [Cảnh báo qua thư email](#4-thông-báo-cảnh-báo-qua-email-người-dùng)
+5. [Cảnh báo qua tin nhắn SMS](#5-thông-báo-qua-sms-short-message-service-qua-số-điện-thoại-của-người-dùng)
+
+### [II. Cấu hình Notification của AlertManager](#ii-cấu-hình-notification-của-alertmanager)
+
+1. [Configuration File](#1-configuration-file)
+2. [Route](#2-route)
+3. [Receiver](#3-receiver)
+4. [Inhibit Rule](#4-inhibit-rule)
+5. [Thử nghiệm thông báo cảnh báo đến một số nền tẳng tin nhắn như email, slack, telegram](#5-thử-nghiệm-thông-báo-cảnh-báo-đến-một-số-nền-tẳng-tin-nhắn-như-email-slack-telegram)
+  5.1 [Mô hình giám sát trên máy tính cá nhân](#51-mô-hình-giám-sát-trên-máy-tính-cá-nhân)
+  5.2 [Cấu hình gửi cảnh báo thông qua ứng dụng slack](#52-cấu-hình-gửi-cảnh-báo-đến-slack)
+  5.3 [Cấu hình gửi cảnh báo qua ứng dụng telegram](#53-cấu-hình-cảnh-báo-qua-telegram)
+  5.4 [Cấu hình gửi cảnh báo qua email](#54-cấu-hình-cảnh-báo-qua-email)
+
+### [III. References](#iii-references)
+
+## I. Khảo sát tính năng cảnh báo của Google cloud platform
+
+
+### Preview
 
 - google cloud cho phép tạo các "notificatin channel" cho phép sử dụng các kênh đó để thông báo cho người dùng hoặc một nhóm người dùng (team làm việc) khi các chính sách được áp dụng. Khi mà thiết lập các chính sách cảnh bảo, ta có thể chọn ai được phép nhận thông báo từ gcp, ví dụ, ta có thể cài đặt monitoring 1 instances để đẩy alert đến với người dùng thông quá slack channel hoặc là on-call team
 
@@ -15,7 +42,7 @@ tạo Notification Channel
 
 GCP hỗ trợ tính năng thông báo/gửi cảnh báo đên đa dạng nền tảng như qua PagerDuty, Slack, Webhook, Email, SMS và tính năng Pub/Sub 
 
-### 1.2 . Thông báo qua tính năng Pub/Sub (publisher / subscriber)
+### 1. Thông báo qua tính năng Pub/Sub (publisher / subscriber)
 - Pub/Sub (viết tắt của Publisher/Subscriber) là một mô hình truyền thông trong các hệ thống phân tán, nơi người gửi (publisher) gửi các thông điệp không đồng bộ đến một hoặc nhiều người nhận (subscriber). Trong mô hình này, người gửi và người nhận không trực tiếp liên kết với nhau. Thay vào đó, thông điệp được gửi thông qua một kênh trung gian gọi là "topic" mà người nhận quan tâm và đã đăng ký.
 
 - Một số khái niệm cơ bản :
@@ -40,9 +67,9 @@ Hệ thống Pub/Sub của google khá hữu dụng khí mà chức năng "Notif
   <img src="assets/pic_2.png">
 </div>
 
-1. thu thập metrics, logs của hệ thổng đang được giám sát
-2. bằng các metric và logs đó chuyển đến hệ thống chính sách cảnh báo giám sát 
-3. các cảnh báo đó được chuyển đến hệ thống notification channel nhằm tạo các message gửi các thông báo đến hệ thống Pub/Sub
+1. Thu thập metrics, logs của hệ thổng đang được giám sát
+2. Bằng các metric và logs đó chuyển đến hệ thống chính sách cảnh báo giám sát 
+3. Các cảnh báo đó được chuyển đến hệ thống notification channel nhằm tạo các message gửi các thông báo đến hệ thống Pub/Sub
 4. Bằng hệ thống Pub/Sub để thực hiện push subcription nhằm gửi subcription đến Cloud Run service 
 5. Cloud Run service có nhiệm vụ đơn giản nhận các các message từ pub/sub và chuyển đổi chúng ra các tin nhắn của google chat
 
@@ -111,12 +138,12 @@ Cấu trúc quá trình cảnh báo người dùng qua telegram chức năng đ�
 
 
 <div align="center">
-  <img width="1500" height="400" src="assets/pic_10.png">
+  <img src="assets/pic_10.png">
 </div>
 
 
 <div align="center">
-  <i> mô hình đơn giản quá trình gửi thông quá qua webhook - Telepush API sẽ nhận các dữ liệu, dich và chuyển hóa thành tin nhắn</i>
+  <i> Mô hình đơn giản quá trình gửi thông quá qua webhook - Telepush API sẽ nhận các dữ liệu, dich và chuyển hóa thành tin nhắn</i>
 </div>
 
 **Bước 1**: Thêm chat bot vào chat list hoặc thêm vào một group chat
@@ -164,6 +191,8 @@ Tại phần Notification Channel chọn channel mà bạn vừa thêm.
 
 
 Theo như trong hình gcp có thể gửi được cảnh báo về cho người dùng tuy nhiên chat bot này chỉ hỗ trợ để đọc và dịch những cảnh báo của ```Alertmanager``` nên như trong hình rất nhiều cảnh báo đã được trả về tuy nhiên lại không có nội dung.
+
+Dưới đây là nội dung của 2  ```POST REQUEST``` webhooks của alertmanager và gcp
 
 
 ```POST REQUEST``` dạng ```JSON``` của **alertmanager**.
@@ -274,7 +303,7 @@ Google cloud hỗ trợ gửi thông báo cảnh báo cho người dùng thông 
 </div>
 
 <div align="center">
-  <i>thêm Notification Channel vào chính sách</i>
+  <i>Thêm Notification Channel vào chính sách</i>
 </div>
 
 
@@ -317,4 +346,307 @@ SMS channel mang lại lới ích cao tuy nhiên có vẻ như google cloud plat
 
 
 
+## II. Cấu hình Notification của AlertManager 
 
+#### 1. Configuration file
+
+Để có thể cài đặt các cài đặt được viết trong config file của alertmaneger ta dùng lệnh :
+
+```sh
+  ./alertmanager --config.file=config.yml
+
+```
+
+Trong ```dockerfile``` hoặc ```docker-compose``` 
+
+```yaml
+  command:
+    - "--config.file=/etc/alertmanager/config.yml"
+```
+
+Dockerfile
+
+```docker
+   CMD [ "--config.file=/etc/alertmanager/alertmanager.yml"
+```
+
+Configuration file được viết dưới dịnh dạng YAML
+
+#### 2. Route
+
+Route là một khối cấu hình dùng để định nghĩa một quy trình định tuyến cảnh báo. Nó sẽ xác định cách cảnh báo sẽ được gom nhóm, xử lý và gửi thông tin cảnh báo đến người dùng 
+
+**matcher :** hỗ trợ cú pháp so sánh với các toán tử  =, !=, =~, !~.
+vd  ```service =~ "name_A,name_b"```
+
+Router trong alert manager hoạt động như một cây định tuyến và các ảnh báo sẽ di chuyển giữa các nút. Cơ chế hoạt động sẽ như sau:
+
+- Các cảnh báo khi tới cây route đều đi qua nút cao nhất của cấu hình là ```route```, và nó khớp với tất cả các cảnh báo (khi không có matcher nào được cấu hình)
+
+- các cảnh báo sau đó đi qua các nút con trong cây, Nếu ```continue``` được đặt là ```false``` thì quá trình sẽ dừng lại sau khi tìm thấy nút con đầu tiên khớp với cảnh báo đó (tức là quá trình so khớp sẽ dừng lại và gửi thông báo), Còn ngược lại nếu như ```continue``` bằng ```true``` nó sẽ tiếp tục so khớp với các nút cùng bậc để tìm nút khớp 
+
+Ví dụ sau
+
+```YAML
+  route:
+    group_by: ['alertname', 'cluster', 'service']
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 3h
+    receiver: team-X-mails
+  
+    routes:
+
+        # route con 1
+      - matchers:
+          - service=~"foo1|foo2|baz"
+        receiver: team-X-mails
+
+        routes:
+          - matchers:
+              - severity="critical"
+            receiver: team-X-pager
+
+        # route con 2
+      - matchers:
+          - service="files"
+        receiver: team-Y-mails
+
+        routes:
+          - matchers:
+              - severity="critical"
+            receiver: team-Y-pager
+
+        # route con 3
+      - matchers:
+          - service="database"
+        receiver: team-DB-pager
+        group_by: [alertname, cluster, database]
+        routes:
+          - matchers:
+              - owner="team-X"
+            receiver: team-X-pager
+            continue: true
+          - matchers:
+              - owner="team-Y"
+            receiver: team-Y-pager
+```
+
+Mô hình cây quá trình hoạt động của ```route``` trên vẽ tại https://prometheus.io/webtools/alerting/routing-tree-editor/ 
+ 
+<div align="center">
+  <img src = "assets/pic_21.png">
+</div>
+
+Quy trình sẽ diễn ra như sau :
+
+- Tại ``route con 1`` khi các cảnh báo có nhãn ```service``` khớp với các giá trị ``foo1``,``foo2`` hoặc ```baz``` thì xẽ được xử lý như sau đối với các cảnh báo có mức độ nghiêm trọng là ```critical``` thì sẽ được gửi đến người/nhóm nhận là ```team-X-pagers```, còn nếu không có mức độ nghiêm trọng như vậy thì cảnh báo sẽ được gửi qua cho ```team-X-mails``` 
+
+- Tại ```route con 2 ``` tương tự như ``route con 1`` nhưng đối với nhẫn ```service``` là ```file``` nếu mức độ nghiêm trong là ```critical``` thì gửi cho ```team-Y-mails``` còn nếu không thì gửi cho ```team-Y-pager```
+
+- Tại ```route con 3``` Xử lý các nhãn ```service``` khớp với giá trị là ```database``` . Nếu như cảnh báo đó có nhãn ```owner``` là **'team-X'** thì gửi cảnh báo đến với ``team-X-pager`` và vì có ```continue: true``` (là sẽ tiếp tục so khớp với nút cũng bậc) nếu sẽ tiếp tục so khớp nếu cảnh báo đó có nhãn ``owner`` là **"team-Y"** thì gửi cho ```team-Y-pager```
+
+
+### 3. Receiver 
+
+Receriver là tên một hay nhiều thiết lập thông báo trên các nền tảng khác nhau.
+
+AlertManager hỗ trợ thông báo cảnh báo đến đa dạng nền kể đến như là email, pageduty, slack, telegram, wechat v.v ...
+
+```yaml
+    # The unique name of the receiver.
+    name: <string>
+    # Configurations for several notification integrations.
+    email_configs:
+      [ - <email_config>, ... ]
+    opsgenie_configs:
+      [ - <opsgenie_config>, ... ]
+    pagerduty_configs:
+      [ - <pagerduty_config>, ... ]
+    pushover_configs:
+      [ - <pushover_config>, ... ]
+    slack_configs:
+      [ - <slack_config>, ... ]
+    sns_configs:
+      [ - <sns_config>, ... ]
+    victorops_configs:
+      [ - <victorops_config>, ... ]
+    webhook_configs:
+      [ - <webhook_config>, ... ]
+    wechat_configs:
+      [ - <wechat_config>, ... ]
+    telegram_configs:
+      [ - <telegram_config>, ... ]
+    webex_configs:
+      [ - <webex_config>, ... ]
+```
+
+### 4. Inhibit rule 
+
+**inhibit_rule:** là một thuộc tính trong Prometheus được sử dụng để kiểm soát việc áp dụng các quy tắc cảnh báo. Nó được dùng để tạm ngừng hoặc loại bỏ các cảnh báo dựa trên các điều kiện.
+
+- **target_match:**  Đây là matcher được sử dụng để xác định các cảnh báo mục tiêu mà bạn muốn tạm ngừng hoặc loại bỏ khi một điều kiện xác định xảy ra
+
+- **source_matcher:**  Đây là matcher được sử dụng để xác định các cảnh báo nguồn, tức là các cảnh báo mà khi trùng khớp với các cảnh báo từ target_match, sẽ gây ra tác động đến các cảnh báo từ target_match. 
+
+Khi ```source_matcher``` trùng khớp với ``target_match``, một quy tắc ```inhibit_rule```được áp dụng và cảnh báo từ ```source_matcher``` sẽ không được gửi đi hoặc sẽ bị loại bỏ tạm thời. Điều này giúp tránh các cảnh báo trùng lặp hoặc không cần thiết khi một điều kiện cụ thể xảy ra.
+
+vd:
+
+```YAML
+  inhibit_rules:
+    - target_match:
+        severity: "warning"
+      source_match:
+        severity: "critical"
+      # Apply inhibition if the alertname and instance are the same.
+      equal: ["alertname", "instance"]
+```
+
+### 5. Thử nghiệm thông báo cảnh báo đến một số nền tẳng tin nhắn như email, slack, telegram, 
+
+##### 5.1 Mô hình giám sát trên máy tính cá nhân
+
+
+
+##### 5.2 Cấu hình gửi cảnh báo đến slack
+
+Alertmanager hỗ trợ gửi cảnh báo qua webhook của slack được gọi là Imcomming Webhook
+
+Để tạo được Imcomming webhooks vào trang web https://api.slack.com/apps tạo một app mới 
+
+
+<div align="center">
+  <img src="assets/pic_22.png">
+</div>
+
+Sau khi tạo app thành công tại **Features** > **Incoming Webhooks** > tiến hành tạo URL webhooks trang chuyển hướng đến trang ủy quyền chọn channel phù hợp 
+
+<div align="center">
+  <img src="assets/pic_24.png">
+</div>
+
+
+Sau khi tạo ```Imcoming Webhook``` thành công sẽ có một url webhook được sinh ra, thêm url đó vào file config của alertmanager
+
+<div align="center">
+  <img src="assets/pic_23.png">
+</div>
+
+
+file cấu hình cho chức năng gửi thông báo qua slack:
+
+```yaml
+- name: "slack"
+  slack_configs:
+    - send_resolved: true
+      text: "{{ .CommonAnnotations.description }}"
+      username: "Prometheus"
+      channel: "#test"
+      api_url: "https://hooks.slack.com/services/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"
+```
+
+Sau khi cấu hình khi có cảnh báo alert manager sẽ gửi một ```POST REQUEST``` đến slack để gửi thông báo cho người dùng .
+
+<div align="center">
+  <img src="assets/pic_25.png">
+</div>
+
+
+##### 5.3 Cấu hình cảnh báo qua telegram
+
+Alertmanager cũng hỗ trợ thông báo cảnh báo bằng telegram ```telegram_config```
+
+```yaml
+  # Whether to notify about resolved alerts.
+  [ send_resolved: <boolean> | default = true ]
+  # The Telegram API URL i.e. https://api.telegram.org.
+  # If not specified, default API URL will be used.
+  [ api_url: <string> | default = global.telegram_api_url ]
+  # Telegram bot token
+  [ bot_token: <string> ]
+  # ID of the chat where to send the messages.
+  [ chat_id: <int> ]
+  # Message template
+  [ message: <tmpl_string> default = '{{ template "telegram.default.message" .}}' ]
+  # Disable telegram notifications
+  [ disable_notifications: <boolean> | default = false ]
+  # Parse mode for telegram message, supported values are MarkdownV2 Markdown, HTML and empty string for plain text.
+  [ parse_mode: <string> | default = "MarkdownV2" ]
+  # The HTTP client's configuration.
+  [ http_config: <http_config> | default = global.http_config ]
+```
+
+****Gửi thông báo thông báo đến telegram thông qua chat bot ```Telepush```****
+
+Telepush là một chat bot đơn giản nhằm dịch ```POST``` requests dưới dạng JSON thành các tin nhắn trên telegram, ứng dụng này tương tự như là Gotify hay là ntfy.sh. Chat bot này hô trợ dịch các ```POST REQUEST``` thành tin nhắn văn bản thân thiện với người dùng hơn và đơn giản thì chatbot này còn hỗ trợ webhooks cho phép việc cài đặt thông báo dễ dàng hơn.
+
+config code sử dung webhook của chat bot telepush đẩy thông báo cảnh báo cho người dùng,
+
+```yaml
+  - name: "telegram"
+    webhook_configs:
+      - url: "https://telepush.dev/api/inlets/alertmanager/<chatbot_token>"
+        http_config:
+```
+
+với ```chatbot_token``` là token của chatbot để có thể tạo token mới cho chatbot telepush gửi lệnh sau ```/start```
+
+<div align="center">
+  <img width="300" src="assets/pic_12.jpg">
+</div>
+
+Bằng cách này alertmanager có thể gửi được cảnh báo cho người dùng 1 cách nhanh chóng qua telegram với thông điệp thân thiện hơn:
+
+<div align="center">
+  <img width="300" src="assets/pic_26.jpg">
+</div>
+
+##### 5.4 Cấu hình cảnh báo qua email
+
+Để cấu hình Alertmanager gửi thông báo qua email, bạn cần chỉ định thông tin cần thiết như địa chỉ email người nhận, máy chủ SMTP và thông tin xác thực.
+
+```yaml
+  - to: <tmpl_string>
+      from: <tmpl_string> | default = global.smtp_from 
+      auth_username: <string> | default = global.smtp_auth_username
+      smarthost: <string> | default = global.smtp_smarthost
+      auth_password: <secret> | default = global.smtp_auth_password 
+      auth_password_file: <string> | default = global.smtp_auth_password_file 
+      auth_secret: <secret> | default = global.smtp_auth_secret 
+      auth_identity: <string> | default = global.smtp_auth_identity 
+```
+
+các tham số trên cần các giá trị như sau:
+
+  - ``to`` : là email của người nhận thông báo
+  - ``from`` : là email của người gửi thông báo
+  - ``smarthost`` : là địa chỉ máy chủ email (địa chỉ máy chủ google là smtp.gmail.com:587)
+  - ```auth_username``` : là tên người dùng xác thực SMTP
+  - ``auth_password`` : là mật khẩu của tài khoản người dùng xác thực
+
+Trước khi có thể gửi được ```email``` cần phải tạo một ``app password`` để  thay thế cho mật khẩu chính của tài khoản Google. Điều này giúp cung cấp một lớp bảo mật bổ sung và hạn chế quyền truy cập cho các ứng dụng hoặc thiết bị không hỗ trợ xác thực hai yếu tố hoặc yêu cầu mật khẩu đặc biệt. Và giá trị auth_password sẽ nhận giá trị này
+
+```yaml
+  - name: "email"
+    email_configs:
+      - to: "manhduc030402@gmail.com"
+        from: 'goldf55f@gmail.com'
+        smarthost: 'smtp.gmail.com:587'
+        auth_username: 'goldf55f@gmail.com'
+        auth_password: 'sercet auth password'
+```
+
+sau khi cấu hình cảnh báo sẽ được gửi về email dưới dạng sau
+
+<div align="center">
+  <img src="assets/pic_27.png">
+</div>
+
+### References
+
+- https://prometheus.io/docs/alerting/latest/configuration/#string 
+- https://github.com/vanduc95/dockprom
+- https://github.com/muety/telepush
+- https://muetsch.io/sending-prometheus-alerts-to-telegram-with-telepush.html
+- https://cloud.google.com/monitoring/support/notification-options
