@@ -1,4 +1,4 @@
-# Survey the alert function of google cloud platform and Configuration of Google Cloud Platform
+# Survey the alert function of google cloud platform and Configuration of AlertManager
 
 ## Table of content
 
@@ -60,7 +60,7 @@ GCP hỗ trợ tính năng thông báo/gửi cảnh báo đên đa dạng nền 
 
 #### usecase với chức năng gửi alert tới ứng dụng google chat bằng tính năng Pub/Sub
 
-Hệ thống Pub/Sub của google khá hữu dụng khí mà chức năng "Notification Channel" không hỗ trợ một số nên tảng, thì ta cũng có thể tự tạo một pipeline riêng để gửi cảnh báo q
+Hệ thống Pub/Sub của google khá hữu dụng khí mà chức năng "Notification Channel" không hỗ trợ một số nên tảng, thì ta cũng có thể tự tạo một pipeline riêng để gửi cảnh báo.
 
 
 <div align="center">
