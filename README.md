@@ -503,7 +503,7 @@ vd:
       equal: ["alertname", "instance"]
 ```
 
-### 5. Thử nghiệm thông báo cảnh báo đến một số nền tẳng tin nhắn như email, slack, telegram, 
+### 5. Thử nghiệm thông báo cảnh báo đến một số nền tẳng tin nhắn như email, slack, telegram bằng các công cụ giám sát như alertmanager, prometheus, node-exporter, cadvisor
 
 ##### 5.1 Mô hình giám sát trên máy tính cá nhân
 
@@ -512,6 +512,23 @@ vd:
   <img src="assets/pic_28.png">
 </div>
 
+cấu trúc của thư mục 
+
+
+```sh
+  .
+  ├── alertmanager
+  │   └── config.yml
+  ├── docker-compose.yaml
+  ├── prometheus1
+  │   ├── alert.rules
+  │   ├── filesd.json
+  │   └── prometheus.yml
+  ├── prometheus2
+      ├── alert.rules
+      ├── filesd.json
+      └── prometheus.yml
+```
 
 ##### 5.2 Cấu hình gửi cảnh báo đến slack
 
