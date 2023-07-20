@@ -72,15 +72,6 @@ services:
   nodeexporter:
     image: prom/node-exporter:v1.5.0
     container_name: nodeexporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - "--path.procfs=/host/proc"
-      - "--path.rootfs=/rootfs"
-      - "--path.sysfs=/host/sys"
-      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
     restart: unless-stopped
     network_mode: host
    
@@ -89,13 +80,6 @@ services:
     image: gcr.io/cadvisor/cadvisor:v0.47.1
     container_name: cadvisor
     privileged: true
-    devices:
-      - /dev/kmsg:/dev/kmsg
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
     restart: unless-stopped
     network_mode: host
     
