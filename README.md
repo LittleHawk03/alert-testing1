@@ -16,11 +16,12 @@
 2. [Route](#2-route)
 3. [Receiver](#3-receiver)
 4. [Inhibit Rule](#4-inhibit-rule)
-5. [Thử nghiệm thông báo cảnh báo đến một số nền tẳng tin nhắn như email, slack, telegram](#5-thử-nghiệm-thông-báo-cảnh-báo-đến-một-số-nền-tẳng-tin-nhắn-như-email-slack-telegram-bằng-các-công-cụ-giám-sát-như-alertmanager-prometheus-node-exporter-cadvisor)
+5. [Thử nghiệm thông báo cảnh báo đến một số nền tẳng tin nhắn như email, slack, telegram, SMS](#5-thử-nghiệm-thông-báo-cảnh-báo-đến-một-số-nền-tẳng-tin-nhắn-như-email-slack-telegram-bằng-các-công-cụ-giám-sát-như-alertmanager-prometheus-node-exporter-cadvisor)
   - 5.1 [Mô hình giám sát trên máy tính cá nhân](#51-mô-hình-giám-sát-trên-máy-tính-cá-nhân)
   - 5.2 [Cấu hình gửi cảnh báo thông qua ứng dụng slack](#52-cấu-hình-gửi-cảnh-báo-đến-slack)
   - 5.3 [Cấu hình gửi cảnh báo qua ứng dụng telegram](#53-cấu-hình-cảnh-báo-qua-telegram)
   - 5.4 [Cấu hình gửi cảnh báo qua email](#54-cấu-hình-cảnh-báo-qua-email)
+  - 5.5 [Cấu hình gửi cảnh báo qua chức năng SMS](#55-thông-báo-cảnh-báo-qua-sms)
 
 ### [III. References](#iii-references)
 
