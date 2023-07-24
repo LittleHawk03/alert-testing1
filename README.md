@@ -752,6 +752,11 @@ Viết service ``sms`` trong [docker-compose.yaml](docker-compose.yaml):
 Đây là cấu hình Alertmanger với service ``sms`` được cung cấp trong Docker compose
 
 ```yaml
+  - match:
+      alertname: high_cpu_load
+    receiver: "sms"
+    repeat_interval: 1m
+    continue: true
   - name: "sms"
     webhook_configs:
       - url: 'http://sms:9089/send'
