@@ -6,6 +6,16 @@ volumes:
   grafana_data: {}
 
 services:
+
+  sms:
+    image: promtotwilio:latest
+    environment:
+      - SID=AC573b376f2fff71a0c0a45fb06c1c6f08
+      - TOKEN=150d3486bea757caaf8e7dc04c2d3f53
+      - RECEIVER=+84349354228
+      - SENDER=+12178058972
+    restart: unless-stopped
+    network_mode: host
   
 
   prometheus1:
@@ -51,6 +61,8 @@ services:
       - "--log.level=info"
     restart: unless-stopped
     network_mode: host
+    depends_on:
+      - sms
     
 
   alertmanager2:
@@ -67,6 +79,8 @@ services:
       - "--log.level=info"
     restart: unless-stopped
     network_mode: host
+    depends_on:
+      - sms
    
 
   nodeexporter:

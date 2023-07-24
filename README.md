@@ -16,7 +16,7 @@
 2. [Route](#2-route)
 3. [Receiver](#3-receiver)
 4. [Inhibit Rule](#4-inhibit-rule)
-5. [Thử nghiệm thông báo cảnh báo đến một số nền tẳng tin nhắn như email, slack, telegram](#5-thử-nghiệm-thông-báo-cảnh-báo-đến-một-số-nền-tẳng-tin-nhắn-như-email-slack-telegram)
+5. [Thử nghiệm thông báo cảnh báo đến một số nền tẳng tin nhắn như email, slack, telegram](#5-thử-nghiệm-thông-báo-cảnh-báo-đến-một-số-nền-tẳng-tin-nhắn-như-email-slack-telegram-bằng-các-công-cụ-giám-sát-như-alertmanager-prometheus-node-exporter-cadvisor)
   - 5.1 [Mô hình giám sát trên máy tính cá nhân](#51-mô-hình-giám-sát-trên-máy-tính-cá-nhân)
   - 5.2 [Cấu hình gửi cảnh báo thông qua ứng dụng slack](#52-cấu-hình-gửi-cảnh-báo-đến-slack)
   - 5.3 [Cấu hình gửi cảnh báo qua ứng dụng telegram](#53-cấu-hình-cảnh-báo-qua-telegram)
@@ -664,6 +664,110 @@ sau khi cấu hình cảnh báo sẽ được gửi về email dưới dạng sa
   <img src="assets/pic_27.png">
 </div>
 
+##### 5.5 Thông báo cảnh báo qua SMS
+
+``SMS`` là một hình thức thông báo cực kỳ nhanh chóng. Tin nhắn SMS thường được gửi đi và nhận trọng thời gian ngắn, giúp đảm bảo cảnh báo sẽ được đưa ra một cách nhanh chóng. Điều này quan trong với các trường hợp khẩn cấp và cần phản hồi nhanh.
+
+Tuy nhiên thì Alermanager cũng như Prometheus không hỗ trợ gửi trực tiếp tin nhắn SMS, do đó ta cần tự viết một ```webhook handler``` chịu trách nhiệm thu nhập thông tin và call api thông qua một bên thứ 3 để gửi tin nhắn.
+
+**Dịch vụ gửi tin nhắn Twilio**
+
+Twilio là dịch vụ cho phép bạn xây dựng ứng dụng liên quan đến việc gửi và nhận các tin nhắn và cuộc gọi trên điện thoại. Twilio thuộc top 10 ứng dụng đám mây đình đám của những năm qua. Và Twilio được tin dùng bởi một số tập đoàn lớn như là UBer
+
+<div align="center">
+  <img width="300" src="assets/pic_29.png">
+</div>
+
+Để thử nghiệm cho chức năng thông báo ta sử dụng tài khoản free trial của twillio, tài khoản trial này sẽ cho ta 15$ để có thể gửi tin nhắn, Sau khi đăng ký tài khoản **```twilio```** chúng sẽ sẽ được cung cấp 1 số điện thoại sẽ đóng vai trò như là người gửi và phải xác nhận số điện thoại đóng vai trò như người nhận thông điệp (ở đây em sử dụng điện thoại các nhân)
+
+<div align="center">
+  <img  src="assets/pic_30.png">
+</div>
+
+- **Account SID**: Đây là một khóa duy nhất được sử dụng để xác định một Tài khoản chính hoặc Tài khoản phụ Twilio cụ thể và là thông tin xác thực hoạt động như một tên người dùng.
+- **Auth Token**: Được sử dụng để xác thực và ủy quyền các yêu cầu API và yêu cầu gửi tin nhắn qua Twilio
+- **Twilio phone number** : là số điện thoại mà Twilio cung cấp được sử dụng cho mục đích nhận và gửi các cuộc gọi và tin nhắn SMS thông qua Twilio API.
+
+
+**Ứng dụng nhận webhook từ alertmanager**
+
+Trong phần này em sẽ tham khảo code của tác giả [Swatto](https://github.com/Swatto) với ứng dụng ```webhook handler``` nhầm thu nhận webhooks được gửi đi bởi alertmanager để gửi chúng như là một tin nhắn sms thông qua ```twilio```.
+
+Ứng dụng webhook handler của tác giả ``Swatto`` được viết bằng ``Go-lang`` với các biến môi trường cụ thể  như là :
+
+```go
+  opts := options{
+		AccountSid: os.Getenv("SID"), // gia tri SID ma twilio cung cap
+		AuthToken:  os.Getenv("TOKEN"),
+		Receiver:   os.Getenv("RECEIVER"), // so dien thoai cua nguoi nhan
+		Sender:     os.Getenv("SENDER"), // so dien thoai cua nguoi gui, cai ma twilio cung cap
+	}
+```
+
+funtion được sử dụng để gửi các tin nhắn 
+
+```go
+    func sendMessage(o *options, alert []byte) {
+    c := twilio.NewClient(o.AccountSid, o.AuthToken) // khoi tao doi tuong khach hang mơi
+    body, _ := jsonparser.GetString(alert, "annotations", "summary")
+
+    if body != "" {
+      body = findAndReplaceLables(body, alert)
+      // cau hinh thong diep can gưi cho nguoi dung, thuong ơ dang rút gọn
+      startsAt, _ := jsonparser.GetString(alert, "startsAt")
+      parsedStartsAt, err := time.Parse(time.RFC3339, startsAt)
+      if err == nil {
+        body = "\"" + body + "\"" + " alert starts at " + parsedStartsAt.Format(time.RFC1123)
+      }
+      // gui tin nhan 
+      message, err := twilio.NewMessage(c, o.Sender, o.Receiver, twilio.Body(body))
+      if err != nil {
+        log.Error(err)
+      } else {
+        log.Infof("Message %s", message.Status)
+      }
+    } else {
+      log.Error("Bad format")
+    }
+}
+```
+Để đơn giản hóa cho tác giả cũng cung cấp ```Dockerfile``` để build image cho ```webhook handler``` này, em đã build lên và lưu trữ trên ```dockerhub``` với images tên ```littlehawk03/promtotwilio:v1.0.0``` với port để send webhook mặc định là 9089. 
+
+Viết service ``sms`` trong [docker-compose.yaml](docker-compose.yaml):
+
+```yaml
+  sms:
+    image: promtotwilio:latest
+    environment:
+      - SID=AC573b376f2fff71a0c0a45fb06c1c6f08
+      - TOKEN=......
+      - RECEIVER=+84349354228
+      - SENDER=+12178058972
+    restart: unless-stopped
+    network_mode: host
+
+```
+
+Đây là cấu hình Alertmanger với service ``sms`` được cung cấp trong Docker compose
+
+```yaml
+  - name: "sms"
+    webhook_configs:
+      - url: 'http://sms:9089/send'
+```
+
+**Nhận thông báo cảnh báo qua tin nhắn SMS**
+
+Sau khi khởi chạy docker-compose service ``sms`` sẽ nhận webhook từ url ``http://sms:9089/send`` hoặc ```http://0.0.0.0:9089/send``` bằng các api được cung cấp bởi twilio sẽ gửi tin nhắn cho người dùng 
+
+kết quả : 
+
+<div align="center">
+  <img width="300" src="assets/pic_31.jpg">
+</div>
+
+ 
+
 ### References
 
 - https://prometheus.io/docs/alerting/latest/configuration/#string 
@@ -671,3 +775,5 @@ sau khi cấu hình cảnh báo sẽ được gửi về email dưới dạng sa
 - https://github.com/muety/telepush
 - https://muetsch.io/sending-prometheus-alerts-to-telegram-with-telepush.html
 - https://cloud.google.com/monitoring/support/notification-options
+- https://github.com/Swatto/promtotwilio
+- https://www.twilio.com/docs/usage/webhooks/sms-webhooks
